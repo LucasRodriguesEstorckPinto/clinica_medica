@@ -21,7 +21,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class CadastroPacienteView(CreateView):
     form_class = PacienteCreationForm
-    # Redireciona para o 'login' após o sucesso [cite: 4]
+    # Redireciona para o 'login' após o sucesso
     success_url = reverse_lazy('login') 
     template_name = 'core/cadastro.html'
 
