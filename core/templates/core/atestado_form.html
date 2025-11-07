@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Emitir Atestado</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        form > p { margin-bottom: 1em; }
+        form label { display: block; font-weight: bold; margin-top: 10px; }
+        input { width: 100%; max-width: 200px; padding: 5px; }
+        .paciente-info { background: #f4f4f4; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <a href="{% url 'cadastrar_anamnese' consulta.id %}"> &larr; Voltar ao Atendimento</a>
+
+    <h2>Emitir Atestado Médico</h2>
+    
+    <div classs="paciente-info">
+        <strong>Paciente:</strong> {{ consulta.paciente.first_name }} {{ consulta.paciente.last_name }} <br>
+        <strong>Data da Consulta:</strong> {{ consulta.data_hora|date:"d/m/Y H:i" }}
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        {{ form.as_p }}
+        
+        <br>
+        <button type="submit">Salvar e Emitir Atestado</button>
+    </form>
+
+</body>
+</html>

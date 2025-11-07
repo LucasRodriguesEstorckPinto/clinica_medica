@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Marcar Consulta</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        form > p { margin-bottom: 1em; }
+        form label { display: block; font-weight: bold; }
+        .errorlist { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <a href="{% url 'home' %}"> &larr; Voltar ao Painel</a>
+
+    <h2>Marcar Nova Consulta</h2>
+    <p>Escolha o profissional e o horário desejado.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="errorlist">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {{ form.as_p }}
+        
+        <button type="submit">Agendar e Pagar</button>
+    </form>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Meu Painel - Clínica Médica</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        nav { background: #f4f4f4; padding: 1em; }
+    </style>
+</head>
+<body>
+   <nav>
+        Olá, <strong>{{ usuario.first_name }} {{ usuario.last_name }}</strong>! 
+        (Usuário: {{ usuario.username }})
+        
+        <form method="post" action="{% url 'logout' %}" style="display: inline; margin-left: 20px;">
+            {% csrf_token %}
+            <button type="submit" style="background: none; border: none; color: blue; text-decoration: underline; cursor: pointer; padding: 0;">
+                Sair
+            </button>
+        </form>
+    </nav>
+
+    <h1>Meu Painel de Paciente</h1>
+
+    <p>Bem-vindo ao seu portal. Aqui você pode gerenciar sua saúde.</p>
+
+   <h2>Ações Rápidas:</h2>
+    <ul>
+        <li><a href="{% url 'marcar_consulta' %}">Marcar Consulta</a></li> 
+        
+        <li><a href="{% url 'minhas_consultas' %}">Minhas Consultas (Cancelar)</a></li>
+        
+        <li><a href="{% url 'meus_exames' %}">Consultar Meus Exames</a></li>
+        <li><a href="{% url 'pagar_consulta' %}">Histórico Financeiro (Pagar)</a></li>
+    </ul>
+
+
+</body>
+</html>

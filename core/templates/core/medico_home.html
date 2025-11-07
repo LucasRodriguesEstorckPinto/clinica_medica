@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Médico</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        nav { background: #f4f4f4; padding: 1em; margin-bottom: 2em; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 2em; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #f0f0f0; }
+        .status-paga { color: green; font-weight: bold; }
+        .status-marcada { color: #cc8400; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav>
+        Olá, Dr(a). <strong>{{ usuario.first_name }} {{ usuario.last_name }}</strong>!
+        (Usuário: {{ usuario.username }})
+
+        <form method="post" action="{% url 'logout' %}" style="display: inline; margin-left: 20px;">
+            {% csrf_token %}
+            <button type="submit" style="background: none; border: none; color: blue; text-decoration: underline; cursor: pointer; padding: 0;">
+                Sair
+            </button>
+        </form>
+    </nav>
+
+    <h1>Minha Agenda</h1>
+
+    <h2>Atendimentos de Hoje ({% now "d/m/Y" %})</h2>
+    {% if consultas_hoje %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Horário</th>
+                    <th>Paciente</th>
+                    <th>Status Pagamento</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for consulta in consultas_hoje %}
+                <tr>
+                    <td>{{ consulta.data_hora|time:"H:i" }}</td>
+                    <td>
+                        <a href="{% url 'prontuario_paciente' consulta.paciente.id %}">
+                            {{ consulta.paciente.first_name }} {{ consulta.paciente.last_name }}
+                        </a>
+                    </td>
+                    <td class="status-{{ consulta.status|lower }}">{{ consulta.get_status_display }}</td>
+                    <td><a href="{% url 'cadastrar_anamnese' consulta.id %}">Atender</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Você não possui mais atendimentos agendados para hoje.</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>Próximos Agendamentos</h2>
+    {% if consultas_futuras %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Horário</th>
+                    <th>Paciente</th>
+                    <th>Status Pagamento</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for consulta in consultas_futuras %}
+                <tr>
+                    <td>{{ consulta.data_hora|date:"d/m/Y" }}</td>
+                    <td>{{ consulta.data_hora|time:"H:i" }}</td>
+                    <td>
+                        <a href="{% url 'prontuario_paciente' consulta.paciente.id %}">
+                            {{ consulta.paciente.first_name }} {{ consulta.paciente.last_name }}
+                        </a>
+                    </td>
+                    <td class="status-{{ consulta.status|lower }}">{{ consulta.get_status_display }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Você não possui agendamentos futuros.</p>
+    {% endif %}
+
+</body>
+</html>

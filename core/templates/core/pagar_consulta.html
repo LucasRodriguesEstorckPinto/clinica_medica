@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Meu Histórico Financeiro</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 2em; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #f4f4f4; }
+        button { background: #28a745; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+        .status-paga { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <a href="{% url 'home' %}"> &larr; Voltar ao Painel</a>
+    
+    <h1>Meu Histórico Financeiro</h1>
+
+    <h2>Consultas Pendentes de Pagamento</h2>
+    {% if consultas_pendentes %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Médico</th>
+                    <th>Data e Hora</th>
+                    <th>Status</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for consulta in consultas_pendentes %}
+                <tr>
+                    <td>Dr(a). {{ consulta.medico.first_name }} {{ consulta.medico.last_name }}</td>
+                    <td>{{ consulta.data_hora|date:"d/m/Y H:i" }}</td>
+                    <td>{{ consulta.get_status_display }}</td>
+                    <td>
+                        <form method="post" action="{% url 'criar_checkout_session' consulta.id %}">
+                            {% csrf_token %}
+                            <button type="submit">Pagar (Stripe)</button>
+                        </form>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Você não tem nenhuma consulta pendente de pagamento.</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>Consultas Pagas</h2>
+    {% if consultas_pagas %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Médico</th>
+                    <th>Data e Hora</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for consulta in consultas_pagas %}
+                <tr>
+                    <td>Dr(a). {{ consulta.medico.first_name }} {{ consulta.medico.last_name }}</td>
+                    <td>{{ consulta.data_hora|date:"d/m/Y H:i" }}</td>
+                    <td class="status-paga">{{ consulta.get_status_display }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Você ainda não possui consultas pagas.</p>
+    {% endif %}
+
+</body>
+</html>

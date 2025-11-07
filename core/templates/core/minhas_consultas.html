@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Minhas Consultas</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 2em; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #f4f4f4; }
+        button { background: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+        
+        /* Estilos para as mensagens de sucesso/erro */
+        .messages { list-style: none; padding: 0; }
+        .messages li { padding: 10px; margin-bottom: 1em; border-radius: 5px; }
+        .messages li.success { background: #d4edda; color: #155724; }
+        .messages li.error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <a href="{% url 'home' %}"> &larr; Voltar ao Painel</a>
+    
+    <h1>Minhas Consultas</h1>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h2>Próximas Consultas</h2>
+    {% if consultas_futuras %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Médico</th>
+                    <th>Data e Hora</th>
+                    <th>Status</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for consulta in consultas_futuras %}
+                <tr>
+                    <td>Dr(a). {{ consulta.medico.first_name }} {{ consulta.medico.last_name }}</td>
+                    <td>{{ consulta.data_hora|date:"d/m/Y H:i" }}</td>
+                    <td>{{ consulta.get_status_display }}</td>
+                    <td>
+                        <form method="post" action="{% url 'cancelar_consulta' consulta.id %}">
+                            {% csrf_token %}
+                            <button type="submit">Cancelar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Você não possui nenhuma consulta futura agendada.</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>Histórico de Consultas</h2>
+    {% if consultas_passadas %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Médico</th>
+                    <th>Data e Hora</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for consulta in consultas_passadas %}
+                <tr>
+                    <td>Dr(a). {{ consulta.medico.first_name }} {{ consulta.medico.last_name }}</td>
+                    <td>{{ consulta.data_hora|date:"d/m/Y H:i" }}</td>
+                    <td>{{ consulta.get_status_display }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Você ainda não possui histórico de consultas.</p>
+    {% endif %}
+
+</body>
+</html>

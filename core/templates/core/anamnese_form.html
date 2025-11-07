@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <style>
+        .atendimento-hub {
+            margin-top: 2em;
+            padding-top: 1em;
+            border-top: 2px solid #f0f0f0;
+        }
+        .atendimento-hub ul { list-style: none; padding: 0; }
+        .atendimento-hub li { display: inline-block; margin-right: 15px; }
+        .atendimento-hub li a {
+            display: block;
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'home' %}"> &larr; Voltar para Agenda</a>
+
+    <h2>Registro de Atendimento</h2>
+    
+    {% if messages %}
+        <ul class="messages" style="list-style: none; padding: 0;">
+            {% for message in messages %}
+                <li style="padding: 10px; margin-bottom: 1em; background: #d4edda; color: #155724;">
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div class="paciente-info">
+        <strong>Paciente:</strong> {{ consulta.paciente.first_name }} {{ consulta.paciente.last_name }} <br>
+        <strong>Data da Consulta:</strong> {{ consulta.data_hora|date:"d/m/Y H:i" }}
+    </div>
+
+    <div class="atendimento-hub">
+        <h3>Ações do Atendimento:</h3>
+        <ul>
+            <li><a href="{% url 'emitir_receita' consulta.id %}">Emitir Receita</a></li>
+            <li><a href="{% url 'emitir_atestado' consulta.id %}" style="background: #17a2b8;">Emitir Atestado</a></li>
+            
+            <li>
+                <form method="post" action="{% url 'concluir_consulta' consulta.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="background: #28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px; font-size: 14px;">
+                        Encerrar Atendimento
+                    </button>
+                </form>
+            </li>
+            </ul>
+    </div>
+
+    <hr>
+    
+    <h3>Formulário de Anamnese</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <br>
+        <button type="submit">Salvar Anamnese</button>
+    </form>
+
+</body>
+</html>
