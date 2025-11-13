@@ -584,3 +584,32 @@ class ReceitaPDFView(View):
         response['Content-Disposition'] = f'filename="receita_consulta_{receita.consulta.id}.pdf"'
         
         return response
+
+
+@method_decorator(login_required, name='dispatch')
+class AtestadoPDFView(View):
+    """
+    Gera e serve o PDF de um Atestado Médico.
+    """
+    def get(self, request, atestado_id, *args, **kwargs):
+        # 1. Busca o objeto Atestado
+        atestado = get_object_or_404(Atestado, id=atestado_id)
+        
+        # 2. Garante que apenas o médico ou o paciente da consulta possam ver
+        user = request.user
+        if user != atestado.consulta.medico and user != atestado.consulta.paciente:
+            return HttpResponse("Acesso Negado", status=403)
+            
+        # 3. Renderiza o template HTML para uma string
+        context = {'atestado': atestado}
+        html_string = render_to_string('core/atestado_pdf.html', context)
+        
+        # 4. Converte o HTML para PDF
+        html = HTML(string=html_string)
+        pdf_file = html.write_pdf()
+        
+        # 5. Cria a Resposta HTTP com o PDF
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'filename="atestado_consulta_{atestado.consulta.id}.pdf"'
+        
+        return response

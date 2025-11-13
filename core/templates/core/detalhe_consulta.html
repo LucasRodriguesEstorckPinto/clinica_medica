@@ -58,6 +58,10 @@
     </div>
     <div class="card-body">
         {% for atestado in atestados %}
+            <a href="{% url 'atestado_pdf' atestado.id %}" target="_blank" class="btn btn-primary btn-sm float-end">
+                Download PDF
+            </a>
+
             <p>
                 Atestado de <strong>{{ atestado.periodo_dias }} dia(s)</strong> de afastamento.
                 (CID: {{ atestado.cid|default:"Não informado" }})
