@@ -1,34 +1,41 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Emitir Atestado</title>
-    <style>
-        body { font-family: sans-serif; margin: 2em; }
-        form > p { margin-bottom: 1em; }
-        form label { display: block; font-weight: bold; margin-top: 10px; }
-        input { width: 100%; max-width: 200px; padding: 5px; }
-        .paciente-info { background: #f4f4f4; padding: 10px; border-radius: 5px; }
-    </style>
-</head>
-<body>
-    <a href="{% url 'cadastrar_anamnese' consulta.id %}"> &larr; Voltar ao Atendimento</a>
+{% extends 'core/base.html' %}
 
-    <h2>Emitir Atestado Médico</h2>
-    
-    <div classs="paciente-info">
-        <strong>Paciente:</strong> {{ consulta.paciente.first_name }} {{ consulta.paciente.last_name }} <br>
-        <strong>Data da Consulta:</strong> {{ consulta.data_hora|date:"d/m/Y H:i" }}
+{% block title %}Emitir Atestado - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light py-3">
+                <h2 class="my-2">Emitir Atestado Médico</h2>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted">Paciente: <strong>{{ consulta.paciente.get_full_name }}</strong></p>
+                <hr>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.periodo_dias.id_for_label }}" class="form-label">{{ form.periodo_dias.label }}:</label>
+                            {{ form.periodo_dias }} </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.cid.id_for_label }}" class="form-label">{{ form.cid.label }}:</label>
+                            {{ form.cid }} </div>
+                    </div>
+                    
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Salvar Atestado</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center py-3">
+                <a href="{% url 'cadastrar_anamnese' consulta.id %}">Voltar ao Atendimento</a>
+            </div>
+        </div>
+
     </div>
-
-    <form method="post">
-        {% csrf_token %}
-        
-        {{ form.as_p }}
-        
-        <br>
-        <button type="submit">Salvar e Emitir Atestado</button>
-    </form>
-
-</body>
-</html>
+</div>
+{% endblock %}

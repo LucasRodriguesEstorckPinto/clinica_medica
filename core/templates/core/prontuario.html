@@ -1,118 +1,105 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Prontuário do Paciente</title>
-    <style>
-        body { font-family: sans-serif; margin: 2em; }
-        .paciente-header { background: #f4f4f4; padding: 15px; border-radius: 5px; margin-bottom: 2em; }
-        .paciente-header h1 { margin: 0; }
-        
-        .consulta-item { border: 1px solid #ccc; border-radius: 5px; margin-bottom: 1.5em; }
-        .consulta-header { background: #f9f9f9; padding: 10px; border-bottom: 1px solid #ccc; }
-        .consulta-header h3 { margin: 0; }
-        .consulta-body { padding: 15px; }
-        .consulta-body h4 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        
-        .exames-tabela { width: 100%; border-collapse: collapse; }
-        .exames-tabela th, .exames-tabela td { border: 1px solid #ccc; padding: 8px; }
-    </style>
-</head>
-<body>
-    <a href="{% url 'home' %}"> &larr; Voltar para Agenda</a>
+{% extends 'core/base.html' %}
 
-    <div class="paciente-header">
-        <h1>{{ paciente.first_name }} {{ paciente.last_name }}</h1>
-        <strong>CPF:</strong> {{ paciente.cpf }} | 
-        <strong>Nascimento:</strong> {{ paciente.data_nascimento|date:"d/m/Y" }}
+{% block title %}Prontuário de {{ paciente.first_name }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+        <div>
+            <h1 class="mb-0 h2">{{ paciente.first_name }} {{ paciente.last_name }}</h1>
+            <p class="mb-0 text-muted">Prontuário Eletrônico</p>
+        </div>
+        <div>
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">&larr; Voltar à Agenda</a>
+        </div>
     </div>
+    <div class="card-body">
+        <p class="mb-1"><strong>CPF:</strong> {{ paciente.cpf }}</p>
+        <p class="mb-1"><strong>Data de Nascimento:</strong> {{ paciente.data_nascimento|date:"d/m/Y" }}</p>
+        <p class="mb-0"><strong>E-mail:</strong> {{ paciente.email }}</p>
+    </div>
+</div>
 
-    <h2>Histórico de Consultas</h2>
-    {% for consulta in consultas %}
-        <div class="consulta-item">
-            <div class="consulta-header">
-                <h3>Consulta em {{ consulta.data_hora|date:"d/m/Y H:i" }}</h3>
-                com <strong>Dr(a). {{ consulta.medico.first_name }} {{ consulta.medico.last_name }}</strong>
-                (Status: {{ consulta.get_status_display }})
-            </div>
+<h2 class="h4 mt-5 mb-3">Histórico de Consultas</h2>
+
+{% for consulta in consultas %}
+    <div class="card shadow-sm mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Consulta em {{ consulta.data_hora|date:"d/m/Y \à\s H:i" }}</h5>
+            {% if consulta.status == 'CONCLUIDA' %}
+                <span class="badge bg-secondary">{{ consulta.get_status_display }}</span>
+            {% elif consulta.status == 'CANCELADA' %}
+                <span class="badge bg-danger">{{ consulta.get_status_display }}</span>
+            {% elif consulta.status == 'PAGA' %}
+                <span class="badge bg-success">{{ consulta.get_status_display }}</span>
+            {% else %}
+                <span class="badge bg-warning text-dark">{{ consulta.get_status_display }}</span>
+            {% endif %} </div>
+        <div class="card-body">
+            <p class="card-text text-muted">Atendido por: <strong>Dr(a). {{ consulta.medico.first_name }} {{ consulta.medico.last_name }}</strong></p>
             
-            <div class="consulta-body">
+            <div class="row g-3">
                 
-                {% if consulta.anamnese %}
-                    <h4>Anamnese</h4>
-                    <p><strong>Queixas:</strong> {{ consulta.anamnese.queixas|linebreaksbr }}</p>
-                    <p><strong>Alergias:</strong> {{ consulta.anamnese.alergias|linebreaksbr }}</p>
-                    <p><strong>Medicamentos em Uso:</strong> {{ consulta.anamnese.medicamentos_uso_continuo|linebreaksbr }}</p>
-                {% else %}
-                    <p><i>Nenhuma anamnese registrada para esta consulta.</i></p>
-                {% endif %}
-                
-                <hr>
+                <div class="col-md-6">
+                    <h6>Anamnese</h6>
+                    {% if consulta.anamnese %} <p class="small"><strong>Queixas:</strong> {{ consulta.anamnese.queixas|default:"N/A"|linebreaksbr }}</p>
+                        <p class="small"><strong>Alergias:</strong> {{ consulta.anamnese.alergias|default:"N/A"|linebreaksbr }}</p>
+                    {% else %}
+                        <p class="small text-muted"><i>Nenhuma anamnese registrada.</i></p>
+                    {% endif %} </div>
 
-                <h4>Receitas Emitidas</h4>
-                {% if consulta.receitas.all %}
-                    <ul>
-                        {% for receita in consulta.receitas.all %}
-                            <li>
-                                <strong>Medicamentos:</strong> {{ receita.medicamentos|linebreaksbr }}
-                                (<i>Assinado: {{ receita.assinatura_digital }}</i>)
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p><i>Nenhuma receita emitida para esta consulta.</i></p>
-                {% endif %}
-
-                <h4>Atestados Emitidos</h4>
-                {% if consulta.atestados.all %}
-                    <ul>
-                        {% for atestado in consulta.atestados.all %}
-                            <li>
-                                <strong>{{ atestado.periodo_dias }} dia(s)</strong> de afastamento.
-                                (CID: {{ atestado.cid|default:"Não informado" }})
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p><i>Nenhum atestado emitido para esta consulta.</i></p>
-                {% endif %}
+                <div class="col-md-6">
+                    <h6>Documentos Emitidos</h6>
+                    {% if consulta.receitas.all %} <p class="small"><strong>Receita:</strong> {{ consulta.receitas.first.medicamentos|truncatechars:100 }}</p>
+                        <ul>
+                            {% for receita in consulta.receitas.all %}
+                                <li>
+                                    <a href="{% url 'receita_pdf' receita.id %}" target="_blank" class="btn btn-secondary btn-sm float-end">
+                                        Ver PDF
+                                    </a>
+                                    <strong>Medicamentos:</strong> {{ receita.medicamentos|truncatechars:100 }}
+                                </li>
+                            {% endfor %} </ul>
+                    {% else %}
+                        <p class="small text-muted"><i>Nenhuma receita emitida.</i></p>
+                    {% endif %} {% if consulta.atestados.all %} <p class="small"><strong>Atestado:</strong> {{ consulta.atestados.first.periodo_dias }} dia(s) de afastamento.</p>
+                    {% else %}
+                        <p class="small text-muted"><i>Nenhum atestado emitido.</i></p>
+                    {% endif %} </div>
             </div>
         </div>
-    {% empty %}
-        <p>Este paciente não possui histórico de consultas.</p>
-    {% endfor %}
-
-    <hr>
-    
-    <h2>Histórico de Exames</h2>
-    {% if exames %}
-        <table class="exames-tabela">
-            <thead>
+    </div>
+{% empty %} <div class="alert alert-info">Este paciente não possui histórico de consultas.</div>
+{% endfor %} <h2 class="h4 mt-5 mb-3">Histórico de Exames</h2>
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th>Tipo do Exame</th>
-                    <th>Data do Laudo</th>
-                    <th>Arquivo</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Data do Laudo</th>
+                    <th scope="col">Arquivo</th>
                 </tr>
             </thead>
             <tbody>
-                {% for exame in exames %}
-                <tr>
-                    <td>{{ exame.tipo }}</td>
+                {% for exame in exames %} <tr>
+                    <td class="fw-bold">{{ exame.tipo }}</td>
                     <td>{{ exame.data_laudo|date:"d/m/Y" }}</td>
                     <td>
-                        {% if exame.arquivo_resultado %}
-                            <a href="{{ exame.arquivo_resultado.url }}" target="_blank">Ver Laudo</a>
+                        {% if exame.arquivo_resultado %} <a href="{{ exame.arquivo_resultado.url }}" target="_blank" class="btn btn-primary btn-sm">
+                                Ver Laudo
+                            </a>
                         {% else %}
-                            Pendente
-                        {% endif %}
-                    </td>
+                            <span class="badge bg-secondary">Pendente</span>
+                        {% endif %} </td>
                 </tr>
-                {% endfor %}
-            </tbody>
+                {% empty %} <tr>
+                    <td colspan="3" class="text-center text-muted p-4">Este paciente não possui exames registrados.</td>
+                </tr>
+                {% endfor %} </tbody>
         </table>
-    {% else %}
-        <p>Este paciente não possui histórico de exames.</p>
-    {% endif %}
+    </div>
+</div>
 
-</body>
-</html>
+{% endblock %}

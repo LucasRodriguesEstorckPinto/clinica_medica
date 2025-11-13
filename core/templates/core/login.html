@@ -1,40 +1,45 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Login - Clínica Médica</title>
-    <style>
-        body { font-family: sans-serif; margin: 2em; }
-        form > div { margin-bottom: 1em; }
-        form label { display: block; }
-        .errorlist { color: red; }
-    </style>
-</head>
-<body>
-    <h2>Login</h2>
-    <p>Acesse seu perfil para marcar consultas.</p>
+{% extends 'core/base.html' %}
 
-    {% if form.errors %}
-        <div class="errorlist">
-            <p>Seu nome de usuário e senha não correspondem. Tente novamente.</p>
+{% block title %}Login - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        
+        <div class="card shadow-lg border-0 rounded-lg mt-5">
+            <div class="card-header"><h3 class="text-center font-weight-light my-4">Login</h3></div>
+            <div class="card-body">
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            Seu e-mail/usuário e senha não correspondem. Tente novamente.
+                        </div>
+                    {% endif %}
+
+                    <div class="form-floating mb-3">
+                        <input class="form-control" id="{{ form.username.id_for_label }}" type="text" name="{{ form.username.name }}" placeholder="seu@email.com" required>
+                        <label for="{{ form.username.id_for_label }}">E-mail ou Nome de Usuário</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input class="form-control" id="{{ form.password.id_for_label }}" type="password" name="{{ form.password.name }}" placeholder="Senha" required>
+                        <label for="{{ form.password.id_for_label }}">Senha</label>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Entrar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center py-3">
+                <div class="small">
+                    <a href="{% url 'cadastro' %}">Ainda não tem conta? Cadastre-se aqui!</a>
+                </div>
+            </div>
         </div>
-    {% endif %}
-
-    <form method="post">
-        {% csrf_token %}
-        <div>
-            <label for="{{ form.username.id_for_label }}">E-mail ou Nome de Usuário:</label>
-            {{ form.username }}
-        </div>
-        <div>
-            <label for="{{ form.password.id_for_label }}">Senha:</label>
-            {{ form.password }}
-        </div>
-        <button type="submit">Entrar</button>
-    </form>
-
-    <hr>
-    <p>Ainda não tem conta? <a href="{% url 'cadastro' %}">Cadastre-se aqui</a>.</p>
-
-</body>
-</html>
+    </div>
+</div>
+{% endblock %}

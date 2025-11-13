@@ -1,36 +1,50 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Marcar Consulta</title>
-    <style>
-        body { font-family: sans-serif; margin: 2em; }
-        form > p { margin-bottom: 1em; }
-        form label { display: block; font-weight: bold; }
-        .errorlist { color: red; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <a href="{% url 'home' %}"> &larr; Voltar ao Painel</a>
+{% extends 'core/base.html' %}
 
-    <h2>Marcar Nova Consulta</h2>
-    <p>Escolha o profissional e o horário desejado.</p>
+{% block title %}Marcar Consulta - {{ block.super }}{% endblock %}
 
-    <form method="post">
-        {% csrf_token %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
         
-        {% if form.non_field_errors %}
-            <div class="errorlist">
-                {% for error in form.non_field_errors %}
-                    <p>{{ error }}</p>
-                {% endfor %}
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light">
+                <h2 class="my-3 text-center">Marcar Nova Consulta</h2>
             </div>
-        {% endif %}
+            
+            <div class="card-body p-4">
+                <p class="text-muted text-center">Escolha o profissional e o horário desejado.</p>
 
-        {{ form.as_p }}
-        
-        <button type="submit">Agendar e Pagar</button>
-    </form>
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors or form.data_hora.errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                            {% for error in form.data_hora.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
 
-</body>
-</html>
+                    <div class="mb-4">
+                        <label for="{{ form.medico.id_for_label }}" class="form-label fs-5">{{ form.medico.label }}:</label>
+                        {{ form.medico }} </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.data_hora.id_for_label }}" class="form-label fs-5">{{ form.data_hora.label }}:</label>
+                        {{ form.data_hora }} </div>
+                    
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Agendar e Ir para Pagamento</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center py-3">
+                <a href="{% url 'home' %}">Voltar ao Painel</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

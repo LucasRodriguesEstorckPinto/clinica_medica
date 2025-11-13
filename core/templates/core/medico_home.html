@@ -1,94 +1,142 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Painel do Médico</title>
-    <style>
-        body { font-family: sans-serif; margin: 2em; }
-        nav { background: #f4f4f4; padding: 1em; margin-bottom: 2em; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 2em; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background: #f0f0f0; }
-        .status-paga { color: green; font-weight: bold; }
-        .status-marcada { color: #cc8400; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <nav>
-        Olá, Dr(a). <strong>{{ usuario.first_name }} {{ usuario.last_name }}</strong>!
-        (Usuário: {{ usuario.username }})
+{% extends 'core/base.html' %}
 
-        <form method="post" action="{% url 'logout' %}" style="display: inline; margin-left: 20px;">
-            {% csrf_token %}
-            <button type="submit" style="background: none; border: none; color: blue; text-decoration: underline; cursor: pointer; padding: 0;">
-                Sair
-            </button>
-        </form>
-    </nav>
+{% block title %}Agenda Médica - {{ block.super }}{% endblock %}
 
-    <h1>Minha Agenda</h1>
+{% block content %}
 
-    <h2>Atendimentos de Hoje ({% now "d/m/Y" %})</h2>
-    {% if consultas_hoje %}
-        <table>
-            <thead>
+<div class="border-bottom pb-2 mb-3">
+    <h1 class="display-5">Minha Agenda</h1>
+    <p class="lead text-muted">Consultas de hoje e agendamentos futuros.</p>
+</div>
+
+<h3 class="mt-4">Atendimentos de Hoje ({% now "d/m/Y" %})</h3>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th>Horário</th>
-                    <th>Paciente</th>
-                    <th>Status Pagamento</th>
-                    <th>Ação</th>
+                    <th scope="col">Horário</th>
+                    <th scope="col">Paciente</th>
+                    <th scope="col">Status Pagamento</th>
+                    <th scope="col">Ação (Prontuário)</th>
                 </tr>
             </thead>
             <tbody>
                 {% for consulta in consultas_hoje %}
                 <tr>
-                    <td>{{ consulta.data_hora|time:"H:i" }}</td>
+                    <td class="fw-bold">{{ consulta.data_hora|time:"H:i" }}</td>
                     <td>
-                        <a href="{% url 'prontuario_paciente' consulta.paciente.id %}">
+                        <a href="{% url 'prontuario_paciente' consulta.paciente.id %}" class="text-decoration-none">
                             {{ consulta.paciente.first_name }} {{ consulta.paciente.last_name }}
                         </a>
                     </td>
-                    <td class="status-{{ consulta.status|lower }}">{{ consulta.get_status_display }}</td>
-                    <td><a href="{% url 'cadastrar_anamnese' consulta.id %}">Atender</a></td>
+                    <td>
+                        {% if consulta.status == 'PAGA' %}
+                            <span class="badge bg-success">{{ consulta.get_status_display }}</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">{{ consulta.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'cadastrar_anamnese' consulta.id %}" class="btn btn-primary btn-sm">
+                            Atender
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted p-4">
+                        Você não possui mais atendimentos agendados para hoje.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-    {% else %}
-        <p>Você não possui mais atendimentos agendados para hoje.</p>
-    {% endif %}
+    </div>
+</div>
 
-    <hr>
 
-    <h2>Próximos Agendamentos</h2>
-    {% if consultas_futuras %}
-        <table>
-            <thead>
+<h3 class="mt-5">Próximos Agendamentos</h3>
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th>Data</th>
-                    <th>Horário</th>
-                    <th>Paciente</th>
-                    <th>Status Pagamento</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Horário</th>
+                    <th scope="col">Paciente</th>
+                    <th scope="col">Status Pagamento</th>
                 </tr>
             </thead>
             <tbody>
                 {% for consulta in consultas_futuras %}
                 <tr>
-                    <td>{{ consulta.data_hora|date:"d/m/Y" }}</td>
+                    <td class="fw-bold">{{ consulta.data_hora|date:"d/m/Y" }}</td>
                     <td>{{ consulta.data_hora|time:"H:i" }}</td>
                     <td>
-                        <a href="{% url 'prontuario_paciente' consulta.paciente.id %}">
+                        <a href="{% url 'prontuario_paciente' consulta.paciente.id %}" class="text-decoration-none">
                             {{ consulta.paciente.first_name }} {{ consulta.paciente.last_name }}
                         </a>
                     </td>
-                    <td class="status-{{ consulta.status|lower }}">{{ consulta.get_status_display }}</td>
+                    <td>
+                        {% if consulta.status == 'PAGA' %}
+                            <span class="badge bg-success">{{ consulta.get_status_display }}</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">{{ consulta.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted p-4">
+                        Você não possui agendamentos futuros.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-    {% else %}
-        <p>Você não possui agendamentos futuros.</p>
-    {% endif %}
+    </div>
+</div>
 
-</body>
-</html>
+<hr class="my-5">
+
+    <h3 class="mt-4">Meus Atendimentos Concluídos (Recentes)</h3>
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Data</th>
+                        <th scope="col">Horário</th>
+                        <th scope="col">Paciente</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consulta in consultas_concluidas %}
+                    <tr>
+                        <td class="fw-bold">{{ consulta.data_hora|date:"d/m/Y" }}</td>
+                        <td>{{ consulta.data_hora|time:"H:i" }}</td>
+                        <td>
+                            <a href="{% url 'prontuario_paciente' consulta.paciente.id %}" class="text-decoration-none">
+                                {{ consulta.paciente.first_name }} {{ consulta.paciente.last_name }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ consulta.get_status_display }}</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted p-4">
+                            Você ainda não concluiu nenhum atendimento.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

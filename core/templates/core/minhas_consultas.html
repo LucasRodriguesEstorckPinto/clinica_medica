@@ -1,91 +1,82 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Minhas Consultas</title>
-    <style>
-        body { font-family: sans-serif; margin: 2em; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 2em; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background: #f4f4f4; }
-        button { background: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer; }
-        
-        /* Estilos para as mensagens de sucesso/erro */
-        .messages { list-style: none; padding: 0; }
-        .messages li { padding: 10px; margin-bottom: 1em; border-radius: 5px; }
-        .messages li.success { background: #d4edda; color: #155724; }
-        .messages li.error { background: #f8d7da; color: #721c24; }
-    </style>
-</head>
-<body>
-    <a href="{% url 'home' %}"> &larr; Voltar ao Painel</a>
-    
-    <h1>Minhas Consultas</h1>
+{% extends 'core/base.html' %}
 
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li class="{{ message.tags }}">{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+{% block title %}Minhas Consultas - {{ block.super }}{% endblock %}
 
-    <h2>Próximas Consultas</h2>
-    {% if consultas_futuras %}
-        <table>
-            <thead>
+{% block content %}
+
+<div class="border-bottom pb-2 mb-3">
+    <h1 class="display-5">Minhas Consultas</h1>
+    <p class="lead text-muted">Visualize suas próximas consultas ou seu histórico de atendimentos.</p>
+</div>
+
+<h3 class="mt-4">Próximas Consultas</h3>
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th>Médico</th>
-                    <th>Data e Hora</th>
-                    <th>Status</th>
-                    <th>Ação</th>
+                    <th scope="col">Médico</th>
+                    <th scope="col">Data e Hora</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Ação</th>
                 </tr>
             </thead>
             <tbody>
                 {% for consulta in consultas_futuras %}
                 <tr>
                     <td>Dr(a). {{ consulta.medico.first_name }} {{ consulta.medico.last_name }}</td>
-                    <td>{{ consulta.data_hora|date:"d/m/Y H:i" }}</td>
-                    <td>{{ consulta.get_status_display }}</td>
+                    <td class="fw-bold">{{ consulta.data_hora|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        {% if consulta.status == 'PAGA' %}
+                            <span class="badge bg-success">{{ consulta.get_status_display }}</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">{{ consulta.get_status_display }}</span>
+                        {% endif %}
+                    </td>
                     <td>
                         <form method="post" action="{% url 'cancelar_consulta' consulta.id %}">
                             {% csrf_token %}
-                            <button type="submit">Cancelar</button>
+                            <button type="submit" class="btn btn-danger btn-sm">Cancelar</button>
                         </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted p-4">
+                        Você não possui nenhuma consulta futura agendada.
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-    {% else %}
-        <p>Você não possui nenhuma consulta futura agendada.</p>
-    {% endif %}
+    </div>
+</div>
 
-    <hr>
+<hr class="my-5">
 
-    <h2>Histórico de Consultas</h2>
-    {% if consultas_passadas %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Médico</th>
-                    <th>Data e Hora</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for consulta in consultas_passadas %}
-                <tr>
-                    <td>Dr(a). {{ consulta.medico.first_name }} {{ consulta.medico.last_name }}</td>
-                    <td>{{ consulta.data_hora|date:"d/m/Y H:i" }}</td>
-                    <td>{{ consulta.get_status_display }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>Você ainda não possui histórico de consultas.</p>
-    {% endif %}
+<h3 class="mt-4">Histórico de Consultas</h3>
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <tbody>
+                    {% for consulta in consultas_passadas %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'detalhe_consulta' consulta.id %}">
+                                Dr(a). {{ consulta.medico.first_name }} {{ consulta.medico.last_name }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'detalhe_consulta' consulta.id %}" class="fw-bold text-decoration-none">
+                                {{ consulta.data_hora|date:"d/m/Y H:i" }}
+                            </a>
+                        </td>
+                        </tr>
+                    {% empty %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-</body>
-</html>
+{% endblock %}

@@ -1,69 +1,96 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Cadastro de Paciente</title>
-    <style>
-        body { font-family: sans-serif; margin: 2em; }
-        form > div { margin-bottom: 1em; }
-        form label { display: block; }
-        input[type="password"] { width: 100%; max-width: 200px; } /* Estilo para senha */
-    </style>
-</head>
-<body>
-    <h2>Cadastro de Paciente</h2>
-    <p>Crie seu perfil para acessar os serviços online.</p>
+{% extends 'core/base.html' %}
 
-    <form method="post">
-        {% csrf_token %} 
-        <div>
-            <label for="{{ form.first_name.id_for_label }}">Primeiro Nome:</label>
-            {{ form.first_name }}
-        </div>
-        <div>
-            <label for="{{ form.last_name.id_for_label }}">Sobrenome:</label>
-            {{ form.last_name }}
-        </div>
-        <div>
-            <label for="{{ form.email.id_for_label }}">E-mail:</label>
-            {{ form.email }}
-        </div>
-        <div>
-            <label for="{{ form.cpf.id_for_label }}">CPF:</label>
-            {{ form.cpf }}
-        </div>
-        <div>
-            <label for="{{ form.data_nascimento.id_for_label }}">Data de Nascimento (AAAA-MM-DD):</label>
-            {{ form.data_nascimento }}
-        </div>
-        <div>
-            <label for="{{ form.telefone.id_for_label }}">Telefone:</label>
-            {{ form.telefone }}
-        </div>
+{% block title %}Cadastro de Paciente - {{ block.super }}{% endblock %}
 
-        <div>
-            <label for="{{ form.password1.id_for_label }}">Senha:</label>
-            {{ form.password1 }}
-        </div>
-        <div>
-            <label for="{{ form.password2.id_for_label }}">Confirmação de Senha:</label>
-            {{ form.password2 }}
-        </div>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
         
-        {% if form.errors %}
-            <div style="color: red;">
-                <p>Por favor, corrija os erros abaixo:</p>
-                <ul>
-                {% for field, error_list in form.errors.items %}
-                    {% for error in error_list %}
-                        <li>{{ field|title }}: {{ error }}</li>
-                    {% endfor %}
-                {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
+        <div class="card shadow-lg border-0 rounded-lg mt-5">
+            <div class="card-header"><h3 class="text-center font-weight-light my-4">Criar Conta de Paciente</h3></div>
+            <div class="card-body">
+                <p class="text-muted text-center small">Crie seu perfil para acessar os serviços online.</p>
 
-        <button type="submit">Cadastrar</button>
-    </form>
-</body>
-</html>
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Por favor, corrija os erros abaixo:</strong>
+                            <ul>
+                            {% for field, error_list in form.errors.items %}
+                                {% for error in error_list %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="{{ form.first_name.id_for_label }}" type="text" name="{{ form.first_name.name }}" required>
+                                <label for="{{ form.first_name.id_for_label }}">Primeiro Nome</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="{{ form.last_name.id_for_label }}" type="text" name="{{ form.last_name.name }}" required>
+                                <label for="{{ form.last_name.id_for_label }}">Sobrenome</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="{{ form.email.id_for_label }}" type="email" name="{{ form.email.name }}" required>
+                                <label for="{{ form.email.id_for_label }}">E-mail</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="{{ form.cpf.id_for_label }}" type="text" name="{{ form.cpf.name }}" required>
+                                <label for="{{ form.cpf.id_for_label }}">CPF</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="{{ form.data_nascimento.id_for_label }}" type="date" name="{{ form.data_nascimento.name }}" required>
+                                <label for="{{ form.data_nascimento.id_for_label }}">Data de Nascimento</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                             <div class="form-floating mb-3">
+                                <input class="form-control" id="{{ form.telefone.id_for_label }}" type="tel" name="{{ form.telefone.name }}">
+                                <label for="{{ form.telefone.id_for_label }}">Telefone (Opcional)</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="{{ form.password1.id_for_label }}" type="password" name="{{ form.password1.name }}" required>
+                                <label for="{{ form.password1.id_for_label }}">Senha</label>
+                            </div>
+                        </div>
+                         <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="{{ form.password2.id_for_label }}" type="password" name="{{ form.password2.name }}" required>
+                                <label for="{{ form.password2.id_for_label }}">Confirme a Senha</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Cadastrar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center py-3">
+                <div class="small"><a href="{% url 'login' %}">Já tem uma conta? Faça o login</a></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

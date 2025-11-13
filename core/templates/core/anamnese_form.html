@@ -1,70 +1,78 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <style>
-        .atendimento-hub {
-            margin-top: 2em;
-            padding-top: 1em;
-            border-top: 2px solid #f0f0f0;
-        }
-        .atendimento-hub ul { list-style: none; padding: 0; }
-        .atendimento-hub li { display: inline-block; margin-right: 15px; }
-        .atendimento-hub li a {
-            display: block;
-            padding: 10px 15px;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-    </style>
-</head>
-<body>
-    <a href="{% url 'home' %}"> &larr; Voltar para Agenda</a>
+{% extends 'core/base.html' %}
 
-    <h2>Registro de Atendimento</h2>
-    
-    {% if messages %}
-        <ul class="messages" style="list-style: none; padding: 0;">
-            {% for message in messages %}
-                <li style="padding: 10px; margin-bottom: 1em; background: #d4edda; color: #155724;">
-                    {{ message }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+{% block title %}Atendimento - {{ consulta.paciente.first_name }} - {{ block.super }}{% endblock %}
 
-    <div class="paciente-info">
-        <strong>Paciente:</strong> {{ consulta.paciente.first_name }} {{ consulta.paciente.last_name }} <br>
-        <strong>Data da Consulta:</strong> {{ consulta.data_hora|date:"d/m/Y H:i" }}
+{% block content %}
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-light py-3">
+        <h2 class="mb-0">Atendimento</h2>
     </div>
+    <div class="card-body">
+        <h4 class="card-title text-primary">{{ consulta.paciente.get_full_name }}</h4>
+        <p class="card-text text-muted mb-0">
+            <strong>Consulta em:</strong> {{ consulta.data_hora|date:"d/m/Y \à\s H:i" }}
+        </p>
+    </div>
+</div>
 
-    <div class="atendimento-hub">
-        <h3>Ações do Atendimento:</h3>
-        <ul>
-            <li><a href="{% url 'emitir_receita' consulta.id %}">Emitir Receita</a></li>
-            <li><a href="{% url 'emitir_atestado' consulta.id %}" style="background: #17a2b8;">Emitir Atestado</a></li>
-            
-            <li>
-                <form method="post" action="{% url 'concluir_consulta' consulta.id %}" style="display: inline;">
+<div class="row g-4">
+
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header">
+                <h4 class="mb-0">1. Formulário de Anamnese</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
                     {% csrf_token %}
-                    <button type="submit" style="background: #28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px; font-size: 14px;">
-                        Encerrar Atendimento
-                    </button>
+
+                    <div class="mb-3">
+                        <label for="{{ form.queixas.id_for_label }}" class="form-label">{{ form.queixas.label }}:</label>
+                        {{ form.queixas }} </div>
+                    <div class="mb-3">
+                        <label for="{{ form.alergias.id_for_label }}" class="form-label">{{ form.alergias.label }}:</label>
+                        {{ form.alergias }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.medicamentos_uso_continuo.id_for_label }}" class="form-label">{{ form.medicamentos_uso_continuo.label }}:</label>
+                        {{ form.medicamentos_uso_continuo }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mt-3">Salvar Anamnese</button>
                 </form>
-            </li>
-            </ul>
+            </div>
+        </div>
     </div>
 
-    <hr>
-    
-    <h3>Formulário de Anamnese</h3>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <br>
-        <button type="submit">Salvar Anamnese</button>
-    </form>
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header">
+                <h4 class="mb-0">2. Ações da Consulta</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Após salvar a anamnese, prossiga para emitir documentos.</p>
+                <div class="list-group">
+                    <a href="{% url 'emitir_receita' consulta.id %}" class="list-group-item list-group-item-action">
+                        Emitir Receita
+                    </a>
+                    <a href="{% url 'emitir_atestado' consulta.id %}" class="list-group-item list-group-item-action">
+                        Emitir Atestado
+                    </a>
+                </div>
 
-</body>
-</html>
+                <hr class="my-4">
+                
+                <h5 class="text-dark">3. Finalizar Atendimento</h5>
+                <p class="text-muted small">Isto moverá a consulta para o histórico do paciente.</p>
+                <form method="post" action="{% url 'concluir_consulta' consulta.id %}">
+                    {% csrf_token %}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success">Encerrar Atendimento</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

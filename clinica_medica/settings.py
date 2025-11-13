@@ -145,3 +145,14 @@ MEDIA_URL = '/media/'
 # Caminho no seu computador onde os arquivos serão salvos
 # (O 'BASE_DIR' é a pasta 'clinica_medica' do seu projeto)
 MEDIA_ROOT = BASE_DIR / 'mediafiles'
+
+
+
+STATIC_URL = '/static/'
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]

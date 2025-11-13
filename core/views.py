@@ -16,6 +16,9 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 import json
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -25,46 +28,60 @@ class CadastroPacienteView(CreateView):
     success_url = reverse_lazy('login') 
     template_name = 'core/cadastro.html'
 
-@method_decorator(login_required, name='dispatch')
+method_decorator(login_required, name='dispatch')
 class HomeView(View):
     def get(self, request, *args, **kwargs):
         
         usuario = request.user
-
         if usuario.is_superuser or usuario.tipo_usuario == CustomUser.TipoUsuario.RECEPCIONISTA:
-            return redirect('/admin/')
- 
-        elif usuario.tipo_usuario == CustomUser.TipoUsuario.MEDICO:
             
-            # 2. BUSCA AS CONSULTAS DO MÉDICO
             agora = timezone.now()
             
-            # Consultas de hoje que ainda não aconteceram
+            consultas_hoje = Consulta.objects.filter(
+                data_hora__date=agora.date()
+            ).order_by('data_hora')
+            
+            context = {
+                'usuario': usuario,
+                'consultas_hoje': consultas_hoje
+            }
+            return render(request, 'core/recepcionista_home.html', context)
+        
+        elif usuario.tipo_usuario == CustomUser.TipoUsuario.MEDICO:
+            
+            agora = timezone.now()
+            
             consultas_hoje = Consulta.objects.filter(
                 medico=usuario,
-                data_hora__gte=agora, # Maior ou igual (gte) a agora
-                data_hora__date=agora.date() # Apenas na data de hoje
+                data_hora__gte=agora,
+                data_hora__date=agora.date(),
+                status__in=[Consulta.StatusConsulta.MARCADA, Consulta.StatusConsulta.PAGA] # Filtra apenas pendentes
             ).order_by('data_hora')
             
-            # Consultas futuras (excluindo as de hoje)
             consultas_futuras = Consulta.objects.filter(
                 medico=usuario,
-                data_hora__date__gt=agora.date() # Apenas em datas futuras
+                data_hora__date__gt=agora.date(),
+                status__in=[Consulta.StatusConsulta.MARCADA, Consulta.StatusConsulta.PAGA] # Filtra apenas pendentes
             ).order_by('data_hora')
             
-            # 3. ATUALIZA O CONTEXTO
+            # ⬇️ ADICIONE ESTA NOVA CONSULTA ⬇️
+            consultas_concluidas = Consulta.objects.filter(
+                medico=usuario,
+                status=Consulta.StatusConsulta.CONCLUIDA
+            ).order_by('-data_hora')[:10] # Pega as últimas 10 concluídas
+            
             context = {
                 'usuario': usuario,
                 'consultas_hoje': consultas_hoje,
-                'consultas_futuras': consultas_futuras
+                'consultas_futuras': consultas_futuras,
+                'consultas_concluidas': consultas_concluidas
             }
-            
             return render(request, 'core/medico_home.html', context)
         
         else: # Paciente
             context = {'usuario': usuario}
             return render(request, 'core/home.html', context)
-
+        
 
 @method_decorator(login_required, name='dispatch')
 class HistoricoFinanceiroView(View):
@@ -506,3 +523,64 @@ class ConcluirConsultaView(View):
         # Avisa o médico e redireciona para a agenda principal
         messages.success(request, f'Atendimento do paciente {consulta.paciente.first_name} concluído com sucesso!')
         return redirect('home')
+
+
+@method_decorator(login_required, name='dispatch')
+class DetalheConsultaView(View):
+    """
+    Controlador para o PACIENTE ver os detalhes
+    de uma consulta concluída.
+    """
+    template_name = 'core/detalhe_consulta.html'
+
+    def get(self, request, consulta_id, *args, **kwargs):
+        # Garante que o paciente só possa ver suas próprias consultas
+        consulta = get_object_or_404(Consulta, id=consulta_id, paciente=request.user)
+        
+        # Busca os documentos associados (se existirem)
+        try:
+            anamnese = Anamnese.objects.get(consulta=consulta)
+        except Anamnese.DoesNotExist:
+            anamnese = None
+            
+        receitas = Receita.objects.filter(consulta=consulta)
+        atestados = Atestado.objects.filter(consulta=consulta)
+        
+        context = {
+            'consulta': consulta,
+            'anamnese': anamnese,
+            'receitas': receitas,
+            'atestados': atestados
+        }
+        return render(request, self.template_name, context)
+
+
+@method_decorator(login_required, name='dispatch')
+class ReceitaPDFView(View):
+    """
+    Gera e serve o PDF de uma Receita Médica.
+    """
+    def get(self, request, receita_id, *args, **kwargs):
+        # Busca o objeto Receita
+        receita = get_object_or_404(Receita, id=receita_id)
+        
+        # Garante que apenas o médico ou o paciente da consulta possam ver
+        user = request.user
+        if user != receita.consulta.medico and user != receita.consulta.paciente:
+            return HttpResponse("Acesso Negado", status=403)
+            
+        # 1. Renderiza o template HTML para uma string
+        context = {'receita': receita}
+        html_string = render_to_string('core/receita_pdf.html', context)
+        
+        # 2. Converte o HTML para PDF usando WeasyPrint
+        html = HTML(string=html_string)
+        pdf_file = html.write_pdf()
+        
+        # 3. Cria a Resposta HTTP com o PDF
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        
+        # 4. Define o cabeçalho para forçar o download (opcional, mas recomendado)
+        response['Content-Disposition'] = f'filename="receita_consulta_{receita.consulta.id}.pdf"'
+        
+        return response
