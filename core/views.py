@@ -613,3 +613,39 @@ class AtestadoPDFView(View):
         response['Content-Disposition'] = f'filename="atestado_consulta_{atestado.consulta.id}.pdf"'
         
         return response
+
+
+@method_decorator(login_required, name='dispatch')
+class RelatorioFinanceiroView(View):
+    template_name = 'core/relatorio_financeiro.html'
+
+    def get(self, request, *args, **kwargs):
+        # 1. Garante permissão (Apenas Recepcionista ou Admin)
+        if not (request.user.is_superuser or 
+                request.user.tipo_usuario == CustomUser.TipoUsuario.RECEPCIONISTA):
+            return redirect('home')
+
+        # 2. Define o período (Mês Atual)
+        agora = timezone.now()
+        mes_atual = agora.month
+        ano_atual = agora.year
+
+        # 3. Busca consultas PAGAS ou CONCLUÍDAS neste mês
+        consultas = Consulta.objects.filter(
+            data_hora__year=ano_atual,
+            data_hora__month=mes_atual,
+            status__in=[Consulta.StatusConsulta.PAGA, Consulta.StatusConsulta.CONCLUIDA]
+        ).order_by('data_hora')
+
+        # 4. Calcula o Total (Assumindo R$ 150,00 por consulta)
+        valor_consulta = 150.00
+        total_receita = consultas.count() * valor_consulta
+
+        context = {
+            'consultas': consultas,
+            'total_receita': total_receita,
+            'mes': agora.strftime('%B/%Y'), # Ex: Novembro/2025
+            'valor_fixo': valor_consulta
+        }
+        
+        return render(request, self.template_name, context)

@@ -1,7 +1,7 @@
 
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import CadastroPacienteView, HomeView, HistoricoFinanceiroView, CriarCheckoutSessionView ,SucessoPagamentoView, CanceladoPagamentoView, stripe_webhook_view, MarcarConsultaView, MinhasConsultasView, CancelarConsultaView, MinhasExamesView, AnamneseView, ReceitaView, AtestadoView, ProntuarioView, ConcluirConsultaView, DetalheConsultaView, ReceitaPDFView, AtestadoPDFView
+from .views import CadastroPacienteView, HomeView, HistoricoFinanceiroView, CriarCheckoutSessionView ,SucessoPagamentoView, CanceladoPagamentoView, stripe_webhook_view, MarcarConsultaView, MinhasConsultasView, CancelarConsultaView, MinhasExamesView, AnamneseView, ReceitaView, AtestadoView, ProntuarioView, ConcluirConsultaView, DetalheConsultaView, ReceitaPDFView, AtestadoPDFView, RelatorioFinanceiroView
 
 urlpatterns = [
     # Rota para o cadastro
@@ -44,5 +44,7 @@ urlpatterns = [
     path('receita/<int:receita_id>/pdf/', ReceitaPDFView.as_view(), name='receita_pdf'),
 
     path('atestado/<int:atestado_id>/pdf/', AtestadoPDFView.as_view(), name='atestado_pdf'),
+
+    path('relatorio/financeiro/', RelatorioFinanceiroView.as_view(), name='relatorio_financeiro'),
 
 ]
