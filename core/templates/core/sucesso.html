@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Pagamento Concluído - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-lg-8 text-center">
+        <div class="alert alert-success" role="alert">
+            <h4 class="alert-heading">Pagamento Iniciado com Sucesso!</h4>
+            <p>Seu pagamento foi processado pelo nosso parceiro Stripe. O status da sua consulta será atualizado automaticamente em seu painel assim que a confirmação final for recebida (via webhook).</p>
+            <hr>
+            <p class="mb-0">Normalmente, isso é instantâneo. Obrigado!</p>
+        </div>
+        <a href="{% url 'pagar_consulta' %}" class="btn btn-primary mt-3">Voltar ao Histórico Financeiro</a>
+    </div>
+</div>
+{% endblock %}

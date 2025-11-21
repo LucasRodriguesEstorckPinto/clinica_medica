@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Pagamento Cancelado - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-lg-8 text-center">
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading">Pagamento Cancelado</h4>
+            <p>Você cancelou o processo de pagamento. Nenhuma cobrança foi efetuada.</p>
+            <hr>
+            <p class="mb-0">Sua consulta ainda está com o status "Marcada" e aguarda pagamento.</p>
+        </div>
+        <a href="{% url 'pagar_consulta' %}" class="btn btn-primary mt-3">Voltar e Tentar Novamente</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% load static %} <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    
+    <title>{% block title %}SIGM - Clínica Médica{% endblock %}</title>
+
+    <style>
+        body { min-height: 100vh; display: flex; flex-direction: column; }
+        main { flex: 1; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+                🏥 SIGM
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item me-3">
+                            <span class="nav-link text-white">
+                                Olá, <strong>{{ user.first_name|default:user.username }}</strong>
+                                ({{ user.get_tipo_usuario_display }})
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <form method="post" action="{% url 'logout' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-light btn-sm">Sair</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="btn btn-light text-primary" href="{% url 'cadastro' %}">Cadastrar-se</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4 mb-5">
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+        
+    </main>
+
+    <footer class="bg-light text-center text-lg-start py-3 mt-auto border-top">
+        <div class="container text-center text-muted">
+            <small>&copy; {% now "Y" %} Sistema Integrado de Gestão Médica. Todos os direitos reservados.</small>
+        </div>
+    </footer>
+
+    </body>
+</html>

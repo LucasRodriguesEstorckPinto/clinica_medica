@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Receita Médica</title>
+    <style>
+        @page {
+            size: A5; /* Tamanho de papel de receituário */
+            margin: 2cm;
+        }
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+        .header h2 {
+            margin: 0;
+            padding: 0;
+        }
+        .header p {
+            margin: 0;
+            font-size: 10pt;
+        }
+        .paciente-info {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .prescricao {
+            margin-top: 30px;
+        }
+        .prescricao h3 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        /* Usa 'white-space' para respeitar as quebras de linha do médico */
+        .medicamentos {
+            white-space: pre-wrap; 
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .posologia {
+            white-space: pre-wrap;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .assinatura {
+            border-top: 1px solid #000;
+            width: 70%;
+            margin: 0 auto;
+            padding-top: 5px;
+            font-size: 10pt;
+        }
+    </style>
+</head>
+<body>
+    
+
+[Image of a medical prescription]
+
+    <div class="header">
+        <h2>Dr(a). {{ receita.consulta.medico.get_full_name }}</h2>
+        <p>Clínico Geral - CRM: [Número Fictício]</p>
+        <p>Endereço da Clínica, 123 - Bairro, Cidade</p>
+    </div>
+
+    <div class="paciente-info">
+        <strong>Paciente:</strong> {{ receita.consulta.paciente.get_full_name }}
+    </div>
+
+    <div class="prescricao">
+        <h3>Prescrição</h3>
+        <div class="medicamentos">
+            {{ receita.medicamentos }}
+        </div>
+        
+        <h3 style="margin-top: 20px;">Instruções de Uso (Posologia)</h3>
+        <div class="posologia">
+            {{ receita.posologia }}
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Data: {{ receita.consulta.data_hora|date:"d/m/Y" }}</p>
+        <div class="assinatura">
+            {{ receita.assinatura_digital }}
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Emitir Receita - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light py-3">
+                <h2 class="my-2">Emitir Receita Digital</h2>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted">Paciente: <strong>{{ consulta.paciente.get_full_name }}</strong></p>
+                <hr>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.medicamentos.id_for_label }}" class="form-label">{{ form.medicamentos.label }}:</label>
+                        {{ form.medicamentos }} </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.posologia.id_for_label }}" class="form-label">{{ form.posologia.label }}:</label>
+                        {{ form.posologia }}
+                    </div>
+                    
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Salvar Receita</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center py-3">
+                <a href="{% url 'cadastrar_anamnese' consulta.id %}">Voltar ao Atendimento</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Detalhes da Consulta - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+        <div>
+            <h1 class="mb-0 h2">Detalhes da Consulta</h1>
+            <p class="mb-0 text-muted">Realizada em: {{ consulta.data_hora|date:"d/m/Y \à\s H:i" }}</p>
+        </div>
+        <div>
+            <a href="{% url 'minhas_consultas' %}" class="btn btn-outline-secondary btn-sm">&larr; Voltar ao Histórico</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <h4 class="card-title text-primary">Dr(a). {{ consulta.medico.get_full_name }}</h4>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header">
+        <h5 class="mb-0">Resumo do Atendimento (Anamnese)</h5>
+    </div>
+    <div class="card-body">
+        {% if anamnese %}
+            <p><strong>Queixas:</strong> {{ anamnese.queixas|default:"N/A"|linebreaksbr }}</p>
+            <p><strong>Alergias:</strong> {{ anamnese.alergias|default:"N/A"|linebreaksbr }}</p>
+        {% else %}
+            <p class="text-muted"><i>Nenhum registro de anamnese para esta consulta.</i></p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header">
+        <h5 class="mb-0">Receitas Emitidas</h5>
+    </div>
+    <div class="card-body">
+        {% for receita in receitas %}
+            <a href="{% url 'receita_pdf' receita.id %}" target="_blank" class="btn btn-primary btn-sm float-end">
+                Download PDF
+            </a>
+            
+            <h6>Medicamentos e Doses:</h6>
+            <p style="white-space: pre-wrap;">{{ receita.medicamentos }}</p>
+            ...
+        {% empty %}
+            ...
+        {% endfor %}
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header">
+        <h5 class="mb-0">Atestados Emitidos</h5>
+    </div>
+    <div class="card-body">
+        {% for atestado in atestados %}
+            <a href="{% url 'atestado_pdf' atestado.id %}" target="_blank" class="btn btn-primary btn-sm float-end">
+                Download PDF
+            </a>
+
+            <p>
+                Atestado de <strong>{{ atestado.periodo_dias }} dia(s)</strong> de afastamento.
+                (CID: {{ atestado.cid|default:"Não informado" }})
+            </p>
+            <p class="text-muted small"><i>Assinado por: {{ atestado.assinatura_digital }}</i></p>
+        {% empty %}
+            <p class="text-muted"><i>Nenhum atestado emitido nesta consulta.</i></p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

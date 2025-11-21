@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Login - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        
+        <div class="card shadow-lg border-0 rounded-lg mt-5">
+            <div class="card-header"><h3 class="text-center font-weight-light my-4">Login</h3></div>
+            <div class="card-body">
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            Seu e-mail/usuário e senha não correspondem. Tente novamente.
+                        </div>
+                    {% endif %}
+
+                    <div class="form-floating mb-3">
+                        <input class="form-control" id="{{ form.username.id_for_label }}" type="text" name="{{ form.username.name }}" placeholder="seu@email.com" required>
+                        <label for="{{ form.username.id_for_label }}">E-mail ou Nome de Usuário</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input class="form-control" id="{{ form.password.id_for_label }}" type="password" name="{{ form.password.name }}" placeholder="Senha" required>
+                        <label for="{{ form.password.id_for_label }}">Senha</label>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Entrar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center py-3">
+                <div class="small">
+                    <a href="{% url 'cadastro' %}">Ainda não tem conta? Cadastre-se aqui!</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

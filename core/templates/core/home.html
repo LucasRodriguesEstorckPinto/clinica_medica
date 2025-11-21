@@ -1,0 +1,52 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Meu Painel - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row mb-3">
+    
+    <div class="col-md-8">
+        <h1 class="display-5 border-bottom pb-2">Meu Painel de Paciente</h1>
+        <p class="lead text-muted">Bem-vindo ao seu portal. Aqui você pode gerenciar sua saúde.</p>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-primary shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Paciente</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text fs-5 mb-0">{{ user.get_full_name }}</p>
+                <small class="text-muted">{{ user.email }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-8">
+        <h3>Ações Rápidas</h3>
+        <div class="list-group shadow-sm">
+            <a href="{% url 'marcar_consulta' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center fs-5 p-3">
+                Marcar Nova Consulta
+                <span class="badge bg-primary rounded-pill fs-6">&gt;</span>
+            </a>
+            <a href="{% url 'minhas_consultas' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center fs-5 p-3">
+                Minhas Consultas (Cancelar)
+                <span class="badge bg-primary rounded-pill fs-6">&gt;</span>
+            </a>
+            <a href="{% url 'meus_exames' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center fs-5 p-3">
+                Consultar Meus Exames
+                <span class="badge bg-primary rounded-pill fs-6">&gt;</span>
+            </a>
+            <a href="{% url 'pagar_consulta' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center fs-5 p-3">
+                Histórico Financeiro (Pagar)
+                <span class="badge bg-primary rounded-pill fs-6">&gt;</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
