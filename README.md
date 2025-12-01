@@ -126,6 +126,11 @@ python3 manage.py runserver
 stripe listen --events checkout.session.completed --forward-to [http://127.0.0.1:8000/pagamentos/stripe-webhook/](http://127.0.0.1:8000/pagamentos/stripe-webhook/)
 ```
 
+### NO NAVEGADOR
+```bash
+http://127.0.0.1:8000/cadastro/
+```
+
 
 ### IMPORTANTE 
 
