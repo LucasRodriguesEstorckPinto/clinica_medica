@@ -18,7 +18,7 @@
 
 ## 📖 Sobre o Projeto
 
-O **SIGM** é um sistema desenvolvido com rigorosos princípios de **Engenharia de Software**. O projeto partiu da modelagem conceitual (UML, Casos de Uso) para uma implementação robusta em **Django**.
+O **SIGM** é um sistema desenvolvido com rigorosos princípios de **Engenharia de Software** e **Banco de Dados**. O projeto partiu da modelagem conceitual (UML, Casos de Uso) para uma implementação robusta em **Django**.
 
 O diferencial deste sistema é a simulação de um ambiente de produção real, eliminando processos manuais através de:
 * **Pagamentos via Cartão de Crédito** (Integração Stripe com Webhooks).
