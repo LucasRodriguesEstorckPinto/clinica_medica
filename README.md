@@ -18,7 +18,7 @@
 
 ## 📖 Sobre o Projeto
 
-O **SIGM** é um sistema desenvolvido com rigorosos princípios de **Engenharia de Software**. O projeto partiu da modelagem conceitual (UML, Casos de Uso) para uma implementação robusta em **Django**.
+O **SIGM** é um sistema desenvolvido com rigorosos princípios de **Engenharia de Software** e **Banco de Dados**. O projeto partiu da modelagem conceitual (UML, Casos de Uso) para uma implementação robusta em **Django**.
 
 O diferencial deste sistema é a simulação de um ambiente de produção real, eliminando processos manuais através de:
 * **Pagamentos via Cartão de Crédito** (Integração Stripe com Webhooks).
@@ -134,6 +134,13 @@ Ao rodar o comando acima, o terminal exibirá uma mensagem como: > Ready! Your w
 - Copie essa chave (whsec_...).
 - Vá no seu settings.py.
 - Atualize a variável STRIPE_WEBHOOK_SECRET com ela. Se você reiniciar o Stripe Listener, essa chave mudará e você precisará atualizar novamente.
+
+
+
+### NO NAVEGADOR
+```bash
+http://127.0.0.1:8000/cadastro/
+```
 
 
 
