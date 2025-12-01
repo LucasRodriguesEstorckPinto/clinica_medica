@@ -126,11 +126,6 @@ python3 manage.py runserver
 stripe listen --events checkout.session.completed --forward-to [http://127.0.0.1:8000/pagamentos/stripe-webhook/](http://127.0.0.1:8000/pagamentos/stripe-webhook/)
 ```
 
-### NO NAVEGADOR
-```bash
-http://127.0.0.1:8000/cadastro/
-```
-
 
 ### IMPORTANTE 
 
@@ -139,6 +134,13 @@ Ao rodar o comando acima, o terminal exibirá uma mensagem como: > Ready! Your w
 - Copie essa chave (whsec_...).
 - Vá no seu settings.py.
 - Atualize a variável STRIPE_WEBHOOK_SECRET com ela. Se você reiniciar o Stripe Listener, essa chave mudará e você precisará atualizar novamente.
+
+
+
+### NO NAVEGADOR
+```bash
+http://127.0.0.1:8000/cadastro/
+```
 
 
 
