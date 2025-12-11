@@ -7,7 +7,7 @@ urlpatterns = [
     # Rota para o cadastro
     path('cadastro/', CadastroPacienteView.as_view(), name='cadastro'),
     # Rota 'home' (página principal)
-    path('', HomeView.as_view(), name='home'), # <-- ADICIONE ESTA LINHA
+    path('', HomeView.as_view(), name='home'),
     
     path('login/', auth_views.LoginView.as_view(template_name='core/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),

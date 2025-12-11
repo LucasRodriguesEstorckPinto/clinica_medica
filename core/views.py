@@ -64,7 +64,6 @@ class HomeView(View):
                 status__in=[Consulta.StatusConsulta.MARCADA, Consulta.StatusConsulta.PAGA] # Filtra apenas pendentes
             ).order_by('data_hora')
             
-            # ⬇️ ADICIONE ESTA NOVA CONSULTA ⬇️
             consultas_concluidas = Consulta.objects.filter(
                 medico=usuario,
                 status=Consulta.StatusConsulta.CONCLUIDA
@@ -131,7 +130,6 @@ class CriarCheckoutSessionView(View):
                                 'description': f'Agendada para: {consulta.data_hora.strftime("%d/%m/%Y %H:%M")}',
                             },
                             # PREÇO EM CENTAVOS: 15000 = R$ 150,00
-                            # (Em um projeto real, puxe isso do BD)
                             'unit_amount': 15000, 
                         },
                         'quantity': 1,
@@ -143,8 +141,6 @@ class CriarCheckoutSessionView(View):
                 cancel_url=YOUR_DOMAIN + reverse('cancelado_pagamento'),
             )
             
-            # Salva o ID do "Payment Intent" na consulta
-            # Isso é VITAL para o webhook saber qual consulta foi paga
             consulta.stripe_checkout_id = checkout_session.id
             consulta.save()
 
@@ -644,7 +640,7 @@ class RelatorioFinanceiroView(View):
         context = {
             'consultas': consultas,
             'total_receita': total_receita,
-            'mes': agora.strftime('%B/%Y'), # Ex: Novembro/2025
+            'mes': agora.strftime('%B/%Y'),
             'valor_fixo': valor_consulta
         }
         
